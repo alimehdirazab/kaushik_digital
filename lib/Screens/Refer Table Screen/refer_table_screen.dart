@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:kaushik_digital/Providers/home_data_provider.dart';
+import 'package:kaushik_digital/utils/preferences/user_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReferTableScreen extends StatefulWidget {
   const ReferTableScreen({super.key});
@@ -8,53 +13,28 @@ class ReferTableScreen extends StatefulWidget {
 }
 
 class _ReferTableScreenState extends State<ReferTableScreen> {
+  String? userId;
+  String? referralId;
+
   @override
   void initState() {
     super.initState();
+
+    _loadUserIdAndFetchReferrals();
+  }
+
+  Future<void> _loadUserIdAndFetchReferrals() async {
+    final data = await UserPreferences.loadProfile();
+    userId = data['userId']?.toString();
+    referralId = data['ReferralId']?.toString();
+    if (userId != null) {
+      Provider.of<HomeDataProvider>(context, listen: false)
+          .getReferalList(userId: userId!, context: context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Example data
-    final List<Map<String, String>> referData = [
-      {
-        'referralId': 'Kaushik0001',
-        'name': 'Anuj Kumar',
-        'phone': '7678367852',
-        'date': '04/05/2025',
-      },
-      {
-        'referralId': 'Kaushik0002',
-        'name': 'Priya Singh',
-        'phone': '9876543210',
-        'date': '10/06/2025',
-      },
-      {
-        'referralId': 'Kaushik0003',
-        'name': 'Rahul Sharma',
-        'phone': '9123456789',
-        'date': '15/06/2025',
-      },
-      {
-        'referralId': 'Kaushik0001',
-        'name': 'Anuj Kumar',
-        'phone': '7678367852',
-        'date': '04/05/2025',
-      },
-      {
-        'referralId': 'Kaushik0002',
-        'name': 'Priya Singh',
-        'phone': '9876543210',
-        'date': '10/06/2025',
-      },
-      {
-        'referralId': 'Kaushik0003',
-        'name': 'Rahul Sharma',
-        'phone': '9123456789',
-        'date': '15/06/2025',
-      },
-    ];
-
     // Example wallet balance
     const double walletBalance = 1250.50;
 
@@ -81,7 +61,7 @@ class _ReferTableScreenState extends State<ReferTableScreen> {
             // Debit Card Style Wallet Card
             Container(
               width: double.infinity,
-              height: 170,
+              height: 190,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 gradient: const LinearGradient(
@@ -162,38 +142,52 @@ class _ReferTableScreenState extends State<ReferTableScreen> {
                         ),
                         const SizedBox(height: 12),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white24,
-                                  ),
-                                  child: const Icon(Icons.credit_card,
-                                      color: Colors.white, size: 18),
+                            // Container(
+                            //   width: 32,
+                            //   height: 32,
+                            //   decoration: const BoxDecoration(
+                            //     shape: BoxShape.circle,
+                            //     color: Colors.white24,
+                            //   ),
+                            //   child: const Icon(Icons.credit_card,
+                            //       color: Colors.white, size: 18),
+                            // ),
+                            // const SizedBox(width: 10),
+                            Expanded(
+                              child: SelectableText(
+                                referralId ?? 'KD1736595521953',
+                                style: const TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 16,
+                                  letterSpacing: 2,
                                 ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  "Kaushik Digital",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Text(
-                              "**** 5678",
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 16,
-                                letterSpacing: 2,
                               ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.copy,
+                                  color: Colors.white70, size: 20),
+                              tooltip: 'Copy Referral ID',
+                              onPressed: () {
+                                final id = referralId ?? 'KD1736595521953';
+                                Clipboard.setData(ClipboardData(text: id));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Referral ID copied!'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.share,
+                                  color: Colors.white70, size: 20),
+                              tooltip: 'Share Referral ID',
+                              onPressed: () async {
+                                final id = referralId ?? 'KD1736595521953';
+                                await Share.share(
+                                    'My referral ID For Kaushik Digital: $id');
+                              },
                             ),
                           ],
                         ),
@@ -207,81 +201,98 @@ class _ReferTableScreenState extends State<ReferTableScreen> {
 
             // Referral List
             Expanded(
-              child: ListView.builder(
-                itemCount: referData.length,
-                itemBuilder: (context, index) {
-                  final data = referData[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.person,
-                                  color: Color(0xFFD32F2F), size: 28),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  data['name'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFD32F2F),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFCDD2), // Red 100
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  data['referralId'] ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFFD32F2F),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Icon(Icons.phone,
-                                  size: 18,
-                                  color: Color(0xFFD84315)), // Deep Orange
-                              const SizedBox(width: 6),
-                              Text(
-                                data['phone'] ?? '',
-                                style: const TextStyle(
-                                    fontSize: 15, color: Colors.black54),
-                              ),
-                              const Spacer(),
-                              const Icon(Icons.calendar_today,
-                                  size: 18, color: Color(0xFFD84315)),
-                              const SizedBox(width: 6),
-                              Text(
-                                data['date'] ?? '',
-                                style: const TextStyle(
-                                    fontSize: 15, color: Colors.black54),
-                              ),
-                            ],
-                          ),
-                        ],
+              child: Consumer<HomeDataProvider>(
+                builder: (context, homeProvider, child) {
+                  if (homeProvider.isReferalLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (homeProvider.referalList.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No referrals found",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
-                    ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: homeProvider.referalList.length,
+                    itemBuilder: (context, index) {
+                      final referal = homeProvider.referalList[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.person,
+                                      color: Color(0xFFD32F2F), size: 28),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      referal.name,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFD32F2F),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFCDD2), // Red 100
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      referal.registrationNo,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFFD32F2F),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  const Icon(Icons.phone,
+                                      size: 18,
+                                      color: Color(0xFFD84315)), // Deep Orange
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    referal.phone,
+                                    style: const TextStyle(
+                                        fontSize: 15, color: Colors.black54),
+                                  ),
+                                  const Spacer(),
+                                  const Icon(Icons.calendar_today,
+                                      size: 18, color: Color(0xFFD84315)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    referal.createdAt.substring(0, 10),
+                                    style: const TextStyle(
+                                        fontSize: 15, color: Colors.black54),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

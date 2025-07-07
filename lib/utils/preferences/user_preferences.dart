@@ -8,6 +8,7 @@ class UserPreferences {
     String? userImage,
     String? phone,
     String? userAddress,
+    String? refrenceId,
     String? msg,
     String? success,
   }) async {
@@ -20,6 +21,7 @@ class UserPreferences {
     await prefs.setString('userImage', userImage ?? '');
     await prefs.setString('phone', phone ?? '');
     await prefs.setString('userAddress', userAddress ?? '');
+    await prefs.setString('refrenceId', refrenceId ?? '');
     await prefs.setString('msg', msg ?? '');
     await prefs.setString('success', success ?? '');
   }
@@ -33,6 +35,7 @@ class UserPreferences {
       'userImage': prefs.getString('userImage'),
       'phone': prefs.getString('phone'),
       'userAddress': prefs.getString('userAddress'),
+      'refrenceId': prefs.getString('refrenceId'),
       'msg': prefs.getString('msg'),
       'success': prefs.getString('success'),
     };
@@ -46,6 +49,7 @@ class UserPreferences {
     await prefs.remove('userImage');
     await prefs.remove('phone');
     await prefs.remove('userAddress');
+    await prefs.remove('refrenceId');
     await prefs.remove('msg');
     await prefs.remove('success');
   }
