@@ -1,4 +1,4 @@
-package com.example.kaushik_digital
+package com.kaushikdigital.ais
 
 import io.flutter.embedding.android.FlutterActivity
 

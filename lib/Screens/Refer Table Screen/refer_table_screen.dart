@@ -36,7 +36,7 @@ class _ReferTableScreenState extends State<ReferTableScreen> {
   @override
   Widget build(BuildContext context) {
     // Example wallet balance
-    const double walletBalance = 1250.50;
+    const double walletBalance = 0.0;
 
     return Scaffold(
       appBar: AppBar(
