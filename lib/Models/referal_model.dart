@@ -1,6 +1,6 @@
 class ReferalModel {
   final int id;
-  final String registrationNo;
+  final String? registrationNo;
   final String? refrenceId;
   final String usertype;
   final int loginStatus;
@@ -12,7 +12,7 @@ class ReferalModel {
   final String? otp;
   final String? expiresAt;
   final String? userAddress;
-  final String dob;
+  final String? dob;
   final String? userImage;
   final int status;
   final int planId;
@@ -30,7 +30,7 @@ class ReferalModel {
 
   ReferalModel({
     required this.id,
-    required this.registrationNo,
+    this.registrationNo,
     this.refrenceId,
     required this.usertype,
     required this.loginStatus,
@@ -42,7 +42,7 @@ class ReferalModel {
     this.otp,
     this.expiresAt,
     this.userAddress,
-    required this.dob,
+    this.dob,
     this.userImage,
     required this.status,
     required this.planId,
@@ -61,34 +61,34 @@ class ReferalModel {
 
   factory ReferalModel.fromJson(Map<String, dynamic> json) {
     return ReferalModel(
-      id: json['id'],
-      registrationNo: json['registration_no'],
-      refrenceId: json['refrence_id'],
-      usertype: json['usertype'],
-      loginStatus: json['login_status'],
-      googleId: json['google_id'],
-      facebookId: json['facebook_id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
-      otp: json['otp'],
-      expiresAt: json['expires_at'],
-      userAddress: json['user_address'],
-      dob: json['dob'],
-      userImage: json['user_image'],
-      status: json['status'],
-      planId: json['plan_id'],
-      startDate: json['start_date'],
-      expDate: json['exp_date'],
-      paypalPaymentId: json['paypal_payment_id'],
-      stripePaymentId: json['stripe_payment_id'],
-      razorpayPaymentId: json['razorpay_payment_id'],
-      paystackPaymentId: json['paystack_payment_id'],
-      planAmount: json['plan_amount'],
-      confirmationCode: json['confirmation_code'],
-      sessionId: json['session_id'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      id: json['id'] ?? 0,
+      registrationNo: json['registration_no']?.toString(),
+      refrenceId: json['refrence_id']?.toString(),
+      usertype: json['usertype'] ?? '',
+      loginStatus: json['login_status'] ?? 0,
+      googleId: json['google_id']?.toString(),
+      facebookId: json['facebook_id']?.toString(),
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      otp: json['otp']?.toString(),
+      expiresAt: json['expires_at']?.toString(),
+      userAddress: json['user_address']?.toString(),
+      dob: json['dob']?.toString(),
+      userImage: json['user_image']?.toString(),
+      status: json['status'] ?? 0,
+      planId: json['plan_id'] ?? 0,
+      startDate: json['start_date']?.toString(),
+      expDate: json['exp_date']?.toString(),
+      paypalPaymentId: json['paypal_payment_id']?.toString(),
+      stripePaymentId: json['stripe_payment_id']?.toString(),
+      razorpayPaymentId: json['razorpay_payment_id']?.toString(),
+      paystackPaymentId: json['paystack_payment_id']?.toString(),
+      planAmount: json['plan_amount']?.toString() ?? '',
+      confirmationCode: json['confirmation_code']?.toString(),
+      sessionId: json['session_id']?.toString(),
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
     );
   }
 }

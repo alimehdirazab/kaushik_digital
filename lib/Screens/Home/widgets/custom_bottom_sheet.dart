@@ -3,16 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaushik_digital/Models/order_model.dart';
+import 'package:kaushik_digital/Providers/profile_detail_provider.dart';
 import 'package:kaushik_digital/Screens/Detail%20screen/sampleplayer.dart';
 import 'package:kaushik_digital/Services/razorpay_service.dart';
 import 'package:kaushik_digital/utils/constants/constants.dart';
 import 'package:kaushik_digital/utils/constants/snackbar.dart';
+import 'package:provider/provider.dart';
 
 class MovieBottomSheet extends StatefulWidget {
   final String movieName;
   final String duration;
   final String moviePoster;
   final num? moviePrice;
+  final int? movieId;
+  final String? movieUrl;
   final BuildContext context;
 
   const MovieBottomSheet({
@@ -21,6 +25,8 @@ class MovieBottomSheet extends StatefulWidget {
     required this.duration,
     required this.moviePoster,
     this.moviePrice,
+    this.movieId,
+    this.movieUrl,
     required this.context,
   });
 
@@ -31,6 +37,7 @@ class MovieBottomSheet extends StatefulWidget {
 class _MovieBottomSheetState extends State<MovieBottomSheet> {
   // final Razorpay razorpay = Razorpay();
   // razorpay = Razorpay();
+  Timer? _paymentTimer;
 
   @override
   void initState() {
@@ -40,33 +47,86 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
 
   final RazorpayService razorpayService = RazorpayService();
 
+  // Check if movie is free and handle accordingly
+  void handleMovieAccess() {
+    final moviePrice = widget.moviePrice ?? 0;
+    
+    if (moviePrice == 0 || moviePrice == 0.0) {
+      // Free movie - go directly to video player
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoPlayerScreen(
+            movieTitle: widget.movieName,
+            movieId: widget.movieId,
+            movieUrl: widget.movieUrl,
+          ),
+        ),
+      );
+    } else {
+      // Paid movie - initiate payment
+      initiatePayment();
+    }
+  }
+
   Future<void> initiatePayment() async {
     try {
       final OrderModel? order =
-          await razorpayService.createOrder(amount: 5, context: widget.context);
+          await razorpayService.createOrder(amount: (widget.moviePrice ?? 0).toInt(), context: widget.context);
       if (order?.orderId == null) {
         snackbar("Error Creating Error ", context);
         Navigator.pop(context);
       }
       if (order!.orderId.isNotEmpty) {
-        Timer(const Duration(seconds: 1), () async {
+        _paymentTimer = Timer(const Duration(seconds: 1), () async {
+          // Check if widget is still mounted before proceeding
+          if (!mounted) return;
+          
           await RazorpayService.checkOutOrder(
               orderModel: order,
-              onSuccess: (response) {
-                snackbar("Payment Successful", context);
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => VideoPlayerScreen()));
+              onSuccess: (response) async {
+                if (mounted) {
+                  // Get user provider for actual user ID
+                  final userProvider = Provider.of<ProfileDetailProvider>(context, listen: false);
+                  
+                  // Verify payment after successful Razorpay response
+                  final verificationResult = await razorpayService.verifyPayment(
+                    razorpaySignature: response.signature ?? '',
+                    razorpayPaymentId: response.paymentId ?? '',
+                    razorpayOrderId: response.orderId ?? '',
+                    userId: userProvider.userId ?? 126, // Use actual user ID or fallback
+                    movieId: widget.movieId ?? 20, // Use actual movie ID or fallback
+                    context: context,
+                  );
+                  
+                  if (verificationResult != null && verificationResult.success) {
+                    snackbar("Payment Successful", context);
+                    print("Registration ID: ${verificationResult.regId}");
+                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => VideoPlayerScreen(
+                              movieTitle: widget.movieName,
+                              movieId: widget.movieId,
+                              movieUrl: widget.movieUrl,
+                            )));
 
-                print("Payment Data ${response.data}");
-                print("Order ID ${response.orderId}");
-                print("Payment ID ${response.paymentId}");
-                print("Payment Signature ${response.signature}");
+                    print("Payment Data ${response.data}");
+                    print("Order ID ${response.orderId}");
+                    print("Payment ID ${response.paymentId}");
+                    print("Payment Signature ${response.signature}");
+                    print("Verification Result: ${verificationResult.toJson()}");
+                  } else {
+                    snackbar(verificationResult?.message ?? "Payment verification failed", context);
+                  }
+                }
               },
               onFailure: (response) {
-                snackbar("Payment Failed!", context);
+                if (mounted) {
+                  snackbar("Payment Failed!", context);
+                }
                 print("**********************************");
                 print(response.code);
                 print(response.error);
@@ -91,6 +151,7 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
 
   @override
   void dispose() {
+    _paymentTimer?.cancel();
     super.dispose();
   }
 
@@ -148,16 +209,16 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
                   borderRadius: BorderRadius.circular(20)),
               padding: const EdgeInsets.all(12),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: w * 0.55,
-                        child: Text(
+                  // Movie Details - Flexible
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
                           widget.movieName,
                           maxLines: 2,
                           softWrap: true,
@@ -169,36 +230,45 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
                                 color: Colors.black),
                           ),
                         ),
-                      ),
-                      Text(
-                        "Duration : ${widget.duration}",
-                        style: GoogleFonts.namdhinggo(
-                          textStyle: TextStyle(
-                              fontSize: h * 0.019,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black),
+                        Text(
+                          "Duration : ${widget.duration}",
+                          style: GoogleFonts.namdhinggo(
+                            textStyle: TextStyle(
+                                fontSize: h * 0.019,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () async {
-                      await initiatePayment();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: w * 0.06, vertical: 13),
-                      child: Text(
-                        "Pay Now",
-                        style: GoogleFonts.namdhinggo(
-                          textStyle: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white),
+                  const SizedBox(width: 8),
+                  // Button - Flexible
+                  Expanded(
+                    flex: 2,
+                    child: GestureDetector(
+                      onTap: () async {
+                        handleMovieAccess();
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: primaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 13),
+                        child: Text(
+                          (widget.moviePrice == null || widget.moviePrice == 0) 
+                              ? "Watch Free" 
+                              : "Pay ₹${widget.moviePrice}",
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.namdhinggo(
+                            textStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white),
+                          ),
                         ),
                       ),
                     ),

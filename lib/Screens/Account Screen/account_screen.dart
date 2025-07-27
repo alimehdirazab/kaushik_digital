@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kaushik_digital/Providers/auth_provider.dart';
 import 'package:kaushik_digital/Providers/profile_detail_provider.dart';
+import 'package:kaushik_digital/Screens/About%20Us/about_us_screen.dart';
 import 'package:kaushik_digital/Screens/Account%20Screen/widgets/custom_listtile.dart';
 import 'package:kaushik_digital/Screens/Login/login_screen.dart';
 import 'package:kaushik_digital/Screens/Profile/profile_screen.dart';
@@ -231,7 +232,12 @@ class _AccountScreenState extends State<AccountScreen> {
                           icon: Icons.info_outline,
                           text: "About Us",
                           onTap: () {
-                            // Add your About Us navigation here
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AboutUsScreen(),
+                              ),
+                            );
                           },
                         ),
                         const Divider(

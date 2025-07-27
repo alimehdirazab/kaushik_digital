@@ -247,7 +247,7 @@ class _ReferTableScreenState extends State<ReferTableScreen> {
                                       ),
                                     ),
                                   ),
-                                  Container(
+                                 referal.registrationNo !=null?  Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
@@ -255,14 +255,14 @@ class _ReferTableScreenState extends State<ReferTableScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      referal.registrationNo,
+                                      referal.registrationNo ?? '',
                                       style: const TextStyle(
                                         fontSize: 13,
                                         color: Color(0xFFD32F2F),
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  ),
+                                  ) : const SizedBox(),
                                 ],
                               ),
                               const SizedBox(height: 10),

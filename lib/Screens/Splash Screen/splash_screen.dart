@@ -15,17 +15,26 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 3), () async {
+    _navigationTimer = Timer(const Duration(seconds: 3), () async {
+      // Check if widget is still mounted before proceeding
+      if (!mounted) return;
+      
       final profileProvider =
           Provider.of<ProfileDetailProvider>(context, listen: false);
       // Ensure profile is loaded from prefs if not already
       if (profileProvider.userId == null) {
         await profileProvider.loadFromPrefs();
       }
+      
+      // Check again if widget is still mounted before navigation
+      if (!mounted) return;
+      
       if (profileProvider.userId != null) {
         Navigator.pushReplacement(
           context,
@@ -38,6 +47,12 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _navigationTimer?.cancel();
+    super.dispose();
   }
 
   @override

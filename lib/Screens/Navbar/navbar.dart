@@ -27,41 +27,40 @@ class _MyNavBarState extends State<MyNavBar> {
   ];
   final PageController pageController = PageController(initialPage: 0);
 
-  Future<bool> _onWillPop() async {
-    if (currentIndex != 0) {
-      setState(() {
-        currentIndex = 0;
-        pageController.jumpToPage(0);
-      });
-      return false;
-    } else {
-      bool? exit = await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Exit App"),
-          content: const Text("Do you really want to exit the app?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () => SystemNavigator.pop(),
-              child: const Text("Exit"),
-            ),
-          ],
-        ),
-      );
-      return exit ?? false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        
+        if (currentIndex != 0) {
+          setState(() {
+            currentIndex = 0;
+            pageController.jumpToPage(0);
+          });
+        } else {
+          bool? exit = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Exit App"),
+              content: const Text("Do you really want to exit the app?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () => SystemNavigator.pop(),
+                  child: const Text("Exit"),
+                ),
+              ],
+            ),
+          );
+        }
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

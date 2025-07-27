@@ -82,4 +82,27 @@ class AccountService {
     return dataMap;
   }
 
+  //About Us
+  Future<Map<String, dynamic>> getAboutUs(BuildContext context) async {
+    Map<String, dynamic> dataMap = {};
+
+    try {
+      http.Response res =
+          await http.get(Uri.parse('$uri/about-us'), headers: {
+        'Content-Type': 'application/json',
+      });
+
+      httpErrorHandle(
+          response: res,
+          context: context,
+          onSucess: () {
+            dataMap = jsonDecode(res.body);
+          });
+    } catch (e) {
+      print(e.toString());
+      snackbar("Error fetching About Us data ", context);
+    }
+    print(dataMap);
+    return dataMap;
+  }
 }

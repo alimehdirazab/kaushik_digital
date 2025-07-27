@@ -39,12 +39,24 @@ class HomeDataProvider extends ChangeNotifier {
           response: response,
           context: context,
           onSucess: () {
-            var responseData = jsonDecode(response.body);
-            videoStreamingApp =
-                VideoStreamingApp.fromJson(responseData['VIDEO_STREAMING_APP']);
-            isLoading = false;
-            notifyListeners();
-            // print(responseData);
+            try {
+              var responseData = jsonDecode(response.body);
+              print("API Response: $responseData"); // Debug print
+              
+              if (responseData['VIDEO_STREAMING_APP'] != null) {
+                videoStreamingApp =
+                    VideoStreamingApp.fromJson(responseData['VIDEO_STREAMING_APP']);
+              } else {
+                print("VIDEO_STREAMING_APP is null in response");
+              }
+              isLoading = false;
+              notifyListeners();
+            } catch (parseError) {
+              print('JSON parsing error: $parseError');
+              isLoading = false;
+              notifyListeners();
+              snackbar("Error loading data", context);
+            }
           });
 
       // if (response.statusCode == 200) {

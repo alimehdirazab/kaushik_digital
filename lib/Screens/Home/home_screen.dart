@@ -138,6 +138,10 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                                   latestmovies.moviePoster,
                                               moviePrice:
                                                   latestmovies.moviePrice,
+                                              movieId:
+                                                  latestmovies.movieId,
+                                              movieUrl:
+                                                  latestmovies.movieUrl,
                                             );
                                           },
                                         );
@@ -227,6 +231,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                               moviePoster:
                                                   latestShows.showPoster,
                                               moviePrice: latestShows.showPrice,
+                                              movieId: latestShows.showId,
+                                              movieUrl: null, // Shows don't have URLs in the current API
                                             );
                                           },
                                         );
@@ -310,6 +316,10 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                                   popularMovie.moviePoster,
                                               moviePrice:
                                                   popularMovie.moviePrice,
+                                              movieId:
+                                                  popularMovie.movieId,
+                                              movieUrl:
+                                                  popularMovie.movieUrl,
                                             );
                                           },
                                         );
@@ -404,6 +414,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                             moviePoster:
                                                 popularShows.showPoster,
                                             moviePrice: popularShows.showPrice,
+                                            movieId: popularShows.showId,
+                                            movieUrl: null, // Shows don't have URLs in the current API
                                           );
                                         },
                                       );
@@ -574,6 +586,9 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                                     ['show_poster'],
                                                 moviePrice: items[rowIndex]
                                                     ['price'],
+                                                movieId: items[rowIndex]
+                                                    ['show_id'],
+                                                movieUrl: null, // Shows don't have URLs in the current API
                                               );
                                             },
                                           );

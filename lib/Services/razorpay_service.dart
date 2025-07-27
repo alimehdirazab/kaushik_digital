@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kaushik_digital/Models/payment_verification_model.dart';
 import 'package:kaushik_digital/Providers/profile_detail_provider.dart';
 import 'package:kaushik_digital/utils/constants/snackbar.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +124,8 @@ class RazorpayService {
         Uri.parse('$uri/create-order'),
         headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode({
-          'amount': amount,
+          'amount': amount * 100, // Convert to paise
+          'user_id': Provider.of<ProfileDetailProvider>(context, listen: false).userId,
         }),
       );
       if (response.statusCode == 200) {
@@ -152,6 +154,45 @@ class RazorpayService {
       );
     }
     return null;
+  }
+
+  // Verify Payment
+  Future<PaymentVerificationModel?> verifyPayment({
+    required String razorpaySignature,
+    required String razorpayPaymentId,
+    required String razorpayOrderId,
+    required int userId,
+    required int movieId,
+    required BuildContext context,
+  }) async {
+    try {
+      log('Verifying payment with signature: $razorpaySignature');
+      http.Response response = await http.post(
+        Uri.parse('$uri/verify-payment'),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'razorpay_signature': razorpaySignature,
+          'razorpay_payment_id': razorpayPaymentId,
+          'razorpay_order_id': razorpayOrderId,
+          'user_id': userId,
+          'movie_id': movieId,
+        }),
+      );
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        log('Payment verification successful: $data');
+        return PaymentVerificationModel.fromJson(data);
+      } else {
+        log('Failed to verify payment: ${response.statusCode}');
+        snackbar('Payment verification failed', context);
+        return null;
+      }
+    } catch (e) {
+      log('Payment verification error: $e');
+      snackbar('Payment verification failed', context);
+      return null;
+    }
   }
 }
 
