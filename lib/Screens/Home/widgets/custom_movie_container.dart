@@ -39,7 +39,7 @@ class CustomMoviesContainer extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               child: CachedNetworkImage(
                 imageUrl: moviePoster,
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -66,7 +66,7 @@ class CustomMoviesContainer extends StatelessWidget {
                   style: GoogleFonts.namdhinggo(
                     fontSize: h * 0.021,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
               ),

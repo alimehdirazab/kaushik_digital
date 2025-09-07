@@ -39,11 +39,63 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'NetflixSans',
-        // ...you can add other theme properties here if needed...
+        brightness: Brightness.dark,
+        primarySwatch: Colors.red,
+        primaryColor: const Color(0xffE50914), // Netflix red
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(color: Colors.white),
+          displayMedium: TextStyle(color: Colors.white),
+          displaySmall: TextStyle(color: Colors.white),
+          headlineLarge: TextStyle(color: Colors.white),
+          headlineMedium: TextStyle(color: Colors.white),
+          headlineSmall: TextStyle(color: Colors.white),
+          titleLarge: TextStyle(color: Colors.white),
+          titleMedium: TextStyle(color: Colors.white),
+          titleSmall: TextStyle(color: Colors.white),
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
+          bodySmall: TextStyle(color: Colors.white70),
+          labelLarge: TextStyle(color: Colors.white),
+          labelMedium: TextStyle(color: Colors.white),
+          labelSmall: TextStyle(color: Colors.white70),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xffE50914),
+            foregroundColor: Colors.white,
+          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xff333333),
+          filled: true,
+          labelStyle: TextStyle(color: Colors.white70),
+          hintStyle: TextStyle(color: Colors.white38),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white24),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xffE50914)),
+          ),
+        ),
+        cardColor: const Color(0xff1a1a1a),
+        dividerColor: Colors.white24,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+      darkTheme: ThemeData(
+        fontFamily: 'NetflixSans',
+        brightness: Brightness.dark,
+        primarySwatch: Colors.red,
+        primaryColor: const Color(0xffE50914),
+        scaffoldBackgroundColor: Colors.black,
+      ),
+      themeMode: ThemeMode.dark, // Force dark mode
       home: const SplashScreen(),
-      // MyHomePage()
-      //  CourseScreen(name:"ebad")
     );
   }
 }

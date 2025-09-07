@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
 
 import 'dart:convert';
 import 'dart:developer';
@@ -114,66 +114,118 @@ class AuthProvider extends ChangeNotifier {
   }
 
 //SignUp User
-  void signUpUser(
-      {required String name,
-      required String email,
-      required String password,
-      required String phone,
-      required String otp,
-      required String dob,
-      String? refrence_id,
-      required BuildContext context}) async {
-    try {
-      // User user = User();
-      isLoading = true;
-      notifyListeners();
-      User user = User(
-          name: name,
-          email: email,
-          phone: phone,
-          password: password,
-          otp: otp,
-          dob: dob,
-          referenceId: refrence_id);
-      print(user.toJson());
-      // print(user.toJson());
-      http.Response res = await http.post(
-        Uri.parse('$uri/signup'),
-        body: jsonEncode(user.toJson()),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-      );
-      print(jsonDecode(res.body));
+// ...existing code...
 
-      httpErrorHandle(
-          response: res,
-          context: context,
-          onSucess: () {
-            // var responseBody = jsonDecode(res.body);
-            String responseBody = res.body;
-            // Extract JSON part
-            final jsonStartIndex = responseBody.indexOf('{');
-            if (jsonStartIndex != -1) {
-              responseBody = responseBody.substring(jsonStartIndex);
-            }
-//Decoding json response
-            final Map<String, dynamic> responseData = jsonDecode(responseBody);
-            if (responseData["VIDEO_STREAMING_APP"]?[0]["success"] == "1") {
-              snackbar(responseData["VIDEO_STREAMING_APP"]?[0]["msg"], context);
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()));
-            }
-          });
-      isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      print(e.toString());
-      snackbar("Something Went Wrong", context);
-      isLoading = false;
-      notifyListeners();
+//SignUp User
+void signUpUser(
+    {required String name,
+    required String email,
+    required String password,
+    required String phone,
+    required String otp,
+    required String dob,
+    String? refrence_id,
+    required BuildContext context}) async {
+  try {
+    // User user = User();
+    isLoading = true;
+    notifyListeners();
+    User user = User(
+        name: name,
+        email: email,
+        phone: phone,
+        password: password,
+        otp: otp,
+        dob: dob,
+        referenceId: refrence_id);
+    print(user.toJson());
+    // print(user.toJson());
+    http.Response res = await http.post(
+      Uri.parse('$uri/signup'),
+      body: jsonEncode(user.toJson()),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+    );
+    print(jsonDecode(res.body));
+
+    // Handle all response status codes properly
+    if (res.statusCode == 200) {
+      String responseBody = res.body;
+      // Extract JSON part
+      final jsonStartIndex = responseBody.indexOf('{');
+      if (jsonStartIndex != -1) {
+        responseBody = responseBody.substring(jsonStartIndex);
+      }
+      //Decoding json response
+      final Map<String, dynamic> responseData = jsonDecode(responseBody);
+      if (responseData["VIDEO_STREAMING_APP"]?[0]["success"] == "1") {
+        snackbar(responseData["VIDEO_STREAMING_APP"]?[0]["msg"], context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      } else {
+        snackbar(responseData["VIDEO_STREAMING_APP"]?[0]["msg"], context);
+      }
+    } else {
+      // Handle error responses (400, 422, 500, etc.)
+      try {
+        String responseBody = res.body;
+        final jsonStartIndex = responseBody.indexOf('{');
+        if (jsonStartIndex != -1) {
+          responseBody = responseBody.substring(jsonStartIndex);
+        }
+        final Map<String, dynamic> errorData = jsonDecode(responseBody);
+        
+        // Check for API error message first
+        if (errorData.containsKey("message")) {
+          snackbar(errorData["message"], context);
+        } else if (errorData["VIDEO_STREAMING_APP"]?[0]["msg"] != null) {
+          snackbar(errorData["VIDEO_STREAMING_APP"]?[0]["msg"], context);
+        } else {
+          // Fallback error messages based on status code
+          switch (res.statusCode) {
+            case 400:
+              snackbar("Invalid request. Please check your details.", context);
+              break;
+            case 422:
+              snackbar("Invalid OTP or expired. Please try again.", context);
+              break;
+            case 500:
+              snackbar("Server error. Please try again later.", context);
+              break;
+            default:
+              snackbar("Something went wrong. Please try again.", context);
+          }
+        }
+      } catch (jsonError) {
+        // If JSON parsing fails, show status code based message
+        switch (res.statusCode) {
+          case 400:
+            snackbar("Invalid request. Please check your details.", context);
+            break;
+          case 422:
+            snackbar("Invalid OTP or expired. Please try again.", context);
+            break;
+          case 500:
+            snackbar("Server error. Please try again later.", context);
+            break;
+          default:
+            snackbar("Something went wrong. Please try again.", context);
+        }
+      }
     }
+    
+    isLoading = false;
+    notifyListeners();
+  } catch (e) {
+    print(e.toString());
+    snackbar("Network error. Please check your connection.", context);
+    isLoading = false;
+    notifyListeners();
   }
+}
+
+// ...existing code...
 
 //Request OTP for Signup
   void requestOTP(

@@ -48,6 +48,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     final homeProvider = Provider.of<HomeDataProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         toolbarHeight: h * 0.08,
         automaticallyImplyLeading: false,
@@ -57,7 +58,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           style: GoogleFonts.montserrat(
             textStyle: TextStyle(
               fontSize: 19,
-              color: primaryColor,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -83,18 +84,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextField(
                         labelText: 'Enter Your Name',
                         controller: _nameController,
-                        textColor: Colors.black,
-                        borderColor: Colors.black,
-                        labelColor: Colors.black,
                         // All fields are optional, so no validator
                       ),
                       const SizedBox(height: 20),
                       CustomTextField(
                         labelText: 'Enter Your Email',
                         controller: _emailController,
-                        textColor: Colors.black,
-                        borderColor: Colors.black,
-                        labelColor: Colors.black,
                         // All fields are optional, so no validator
                       ),
                       const SizedBox(height: 20),
@@ -103,9 +98,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       CustomTextField(
                         labelText: 'Enter Your Address',
                         controller: _addressController,
-                        borderColor: Colors.black,
-                        textColor: Colors.black,
-                        labelColor: Colors.black,
                         // All fields are optional, so no validator
                       ),
                       const SizedBox(height: 20),
@@ -139,7 +131,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                 context: context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
+                            backgroundColor: Color(0xFFE50914), // Netflix red
                             padding: const EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 32),
                             shape: RoundedRectangleBorder(

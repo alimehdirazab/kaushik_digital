@@ -17,7 +17,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     double h = MediaQuery.sizeOf(context).height;
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         body: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -26,7 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 height: h * 0.2,
                 padding: EdgeInsets.only(top: h * 0.08, left: 15, right: 15),
                 decoration: BoxDecoration(
-                    color: primaryColor,
+                    color: Color(0xFFE50914), // Netflix red
                     borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(
                           25,

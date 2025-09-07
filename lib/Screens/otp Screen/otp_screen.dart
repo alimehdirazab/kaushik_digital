@@ -29,15 +29,17 @@ class _OtpScreenState extends State<OtpScreen> {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
         toolbarHeight: 65,
         centerTitle: true,
         title: Text("OTP Verification",
             style: GoogleFonts.montserrat(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 fontSize: 19,
-                color: primaryColor,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             )),
@@ -60,7 +62,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   )),
             ),
             Center(
-              child: Text(widget.phNo ?? "",
+              child: Text(widget.phNo,
                   style: GoogleFonts.abel(
                     textStyle: const TextStyle(
                       fontSize: 18,
@@ -86,25 +88,25 @@ class _OtpScreenState extends State<OtpScreen> {
                 animationType: AnimationType.fade,
                 keyboardType: TextInputType.number,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                textStyle: TextStyle(
-                  color: primaryColor,
+                textStyle: const TextStyle(
+                  color: Colors.white,
                   fontSize: 17,
                   fontWeight: FontWeight.normal,
                 ),
-                cursorColor: primaryColor,
+                cursorColor: const Color(0xFFE50914), // Netflix red
                 pinTheme: PinTheme(
                   borderWidth: 1,
                   shape: PinCodeFieldShape.box,
                   fieldWidth: 40,
                   fieldHeight: 43,
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  activeFillColor: Colors.transparent,
-                  inactiveFillColor: Colors.transparent,
-                  inactiveColor: Colors.grey,
-                  selectedFillColor: Colors.transparent,
-                  activeColor: primaryColor,
+                  activeFillColor: Colors.grey[900],
+                  inactiveFillColor: Colors.grey[900],
+                  inactiveColor: Colors.grey[700],
+                  selectedFillColor: Colors.grey[800],
+                  activeColor: const Color(0xFFE50914), // Netflix red
                   disabledColor: Colors.grey,
-                  selectedColor: primaryColor,
+                  selectedColor: const Color(0xFFE50914), // Netflix red
                   errorBorderColor: Colors.red,
                 ),
               ),
@@ -131,7 +133,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       context: context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: const Color(0xFFE50914), // Netflix red
                   padding:
                       const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                   shape: RoundedRectangleBorder(

@@ -90,6 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
         context: context,
         removeTop: true,
         child: Scaffold(
+          backgroundColor: Colors.black,
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15.0),
             child: Column(
@@ -99,9 +100,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 CustomTextField(
                   labelText: "Search Movie",
                   controller: searchController,
-                  textColor: Colors.black,
-                  borderColor: Colors.black,
-                  labelColor: Colors.black,
+                  textColor: Colors.white,
+                  borderColor: Colors.grey,
+                  labelColor: Colors.grey,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -127,7 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   style: TextStyle(
                                       fontSize: h * 0.015,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                                      color: Colors.white),
                                 ),
                               ],
                             ),
@@ -147,7 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           style: TextStyle(
                               fontSize: h * 0.015,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                              color: Colors.grey),
                         ),
                       ),
                     ),
@@ -171,7 +172,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   style: TextStyle(
                                       fontSize: h * 0.015,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                                      color: Colors.white),
                                 ),
                               ],
                             ),
@@ -191,7 +192,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           style: TextStyle(
                               fontSize: h * 0.015,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                              color: Colors.grey),
                         ),
                       ),
                     ),
@@ -217,7 +218,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                         textStyle: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w700,
-                                            color: Colors.black),
+                                            color: Colors.white),
                                       ),
                                     ),
                                   ),

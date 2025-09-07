@@ -62,7 +62,7 @@ class _AccountScreenState extends State<AccountScreen> {
         context: context,
         removeTop: true,
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.black,
           body: SingleChildScrollView(
             child: SafeArea(
               child: Padding(
@@ -98,7 +98,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 20,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                         subtitle: Text(
@@ -108,6 +108,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           style: const TextStyle(
                             fontWeight: FontWeight.w300,
                             fontSize: 14,
+                            color: Colors.grey,
                           ),
                         ),
                       ),

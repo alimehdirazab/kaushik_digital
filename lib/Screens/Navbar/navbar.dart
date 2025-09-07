@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaushik_digital/Screens/Account%20Screen/account_screen.dart';
 import 'package:kaushik_digital/Screens/Home/home_screen.dart';
-import 'package:kaushik_digital/utils/constants/constants.dart';
 
 import '../My List/my_list_screen.dart';
 import '../Search Screen/search_screen.dart';
@@ -68,7 +67,7 @@ class _MyNavBarState extends State<MyNavBar> {
         bottomNavigationBar: BottomAppBar(
           elevation: 3,
           height: MediaQuery.of(context).size.height * 0.1,
-          color: Colors.white,
+          color: Colors.black,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: Padding(
             padding: const EdgeInsets.only(left: 5, right: 5),
@@ -92,8 +91,8 @@ class _MyNavBarState extends State<MyNavBar> {
 
                         size: h * 0.038,
                         color: currentIndex == 0
-                            ? primaryColor
-                            : const Color.fromARGB(255, 129, 129, 129),
+                            ? Color(0xFFE50914) // Netflix red
+                            : Colors.grey,
 
                         // color: Colors.amber,
                       ),
@@ -106,8 +105,8 @@ class _MyNavBarState extends State<MyNavBar> {
                               fontSize: h * 0.016,
                               fontWeight: FontWeight.w900,
                               color: currentIndex == 0
-                                  ? primaryColor
-                                  : const Color.fromARGB(255, 129, 129, 129),
+                                  ? Color(0xFFE50914) // Netflix red
+                                  : Colors.grey,
                             ),
                           ))
                     ],
@@ -128,8 +127,8 @@ class _MyNavBarState extends State<MyNavBar> {
                         Icons.search,
                         size: h * 0.038,
                         color: currentIndex == 1
-                            ? primaryColor
-                            : const Color.fromARGB(255, 129, 129, 129),
+                            ? Color(0xFFE50914) // Netflix red
+                            : Colors.grey,
                       ),
                       // const SizedBox(
                       //   height: 2,
@@ -140,8 +139,8 @@ class _MyNavBarState extends State<MyNavBar> {
                               fontSize: h * 0.016,
                               fontWeight: FontWeight.w900,
                               color: currentIndex == 1
-                                  ? primaryColor
-                                  : const Color.fromARGB(255, 129, 129, 129),
+                                  ? Color(0xFFE50914) // Netflix red
+                                  : Colors.grey,
                             ),
                           )),
                     ],
@@ -163,8 +162,8 @@ class _MyNavBarState extends State<MyNavBar> {
                         height: h * 0.038,
                         width: 28,
                         color: currentIndex == 2
-                            ? primaryColor
-                            : const Color.fromARGB(255, 129, 129, 129),
+                            ? Color(0xFFE50914) // Netflix red
+                            : Colors.grey,
 
                         // color: Colors.amber,
                       ),
@@ -174,8 +173,8 @@ class _MyNavBarState extends State<MyNavBar> {
                               fontSize: h * 0.016,
                               fontWeight: FontWeight.w900,
                               color: currentIndex == 2
-                                  ? primaryColor
-                                  : const Color.fromARGB(255, 129, 129, 129),
+                                  ? Color(0xFFE50914) // Netflix red
+                                  : Colors.grey,
                             ),
                           ))
                     ],
@@ -195,8 +194,8 @@ class _MyNavBarState extends State<MyNavBar> {
                       Icon(
                         Icons.account_circle_outlined, size: h * 0.038,
                         color: currentIndex == 3
-                            ? primaryColor
-                            : const Color.fromARGB(255, 129, 129, 129),
+                            ? Color(0xFFE50914) // Netflix red
+                            : Colors.grey,
 
                         // color: Colors.amber,
                       ),
@@ -206,8 +205,8 @@ class _MyNavBarState extends State<MyNavBar> {
                               fontSize: h * 0.016,
                               fontWeight: FontWeight.w900,
                               color: currentIndex == 3
-                                  ? primaryColor
-                                  : const Color.fromARGB(255, 129, 129, 129),
+                                  ? Color(0xFFE50914) // Netflix red
+                                  : Colors.grey,
                             ),
                           ))
                     ],

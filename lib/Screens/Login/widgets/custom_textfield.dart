@@ -41,16 +41,18 @@ class CustomTextField extends StatelessWidget {
         labelText: labelText,
         labelStyle: GoogleFonts.namdhinggo(
           textStyle: TextStyle(
-            color: labelColor,
+            color: Colors.grey[400],
           ),
         ),
+        filled: true,
+        fillColor: Colors.grey[900],
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor),
+          borderSide: BorderSide(color: Colors.grey[700]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor, width: 2),
+          borderSide: BorderSide(color: Color(0xFFE50914), width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -62,7 +64,7 @@ class CustomTextField extends StatelessWidget {
         ),
       ),
       style: TextStyle(
-        color: textColor,
+        color: Colors.white,
         decoration: TextDecoration.none, // Removes underline from the text
       ),
       validator: (val) {

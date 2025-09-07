@@ -46,26 +46,28 @@ class PhNoTextfield extends StatelessWidget {
         }
         return null;
       },
-      style: const TextStyle(color: Colors.black),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[900],
         hintText: 'e.g., 3123456789',
         hintStyle: GoogleFonts.namdhinggo(
           textStyle: const TextStyle(color: Colors.grey),
         ),
         labelText: 'Enter Your Mobile Number',
         labelStyle: GoogleFonts.namdhinggo(
-          textStyle: const TextStyle(color: Colors.black),
+          textStyle: TextStyle(color: Colors.grey[400]),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Colors.grey[700]!),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: const BorderSide(color: Color(0xFFE50914), width: 2),
           borderRadius: BorderRadius.circular(8),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Colors.grey[700]!),
           borderRadius: BorderRadius.circular(8),
         ),
         errorBorder: OutlineInputBorder(

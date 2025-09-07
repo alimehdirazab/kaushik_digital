@@ -1,8 +1,9 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaushik_digital/Screens/Login%20with%20OTP/widgets/ph_no_textfield.dart';
 import 'package:kaushik_digital/Screens/Login/widgets/custom_textfield.dart';
-import 'package:kaushik_digital/Screens/Signup/widgets/dob_textfield.dart';
 import 'package:kaushik_digital/Services/auth_service.dart';
 import 'package:kaushik_digital/utils/constants/constants.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +66,7 @@ class _SignupScreenState extends State<SignupScreen> {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: whiteColor, // Set white background
+      backgroundColor: Colors.black, // Dark background for Netflix theme
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
@@ -106,7 +107,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           textStyle: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: primaryColor,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -211,7 +212,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
+                          backgroundColor: Color(0xFFE50914), // Netflix red
                           padding: const EdgeInsets.symmetric(
                               vertical: 12, horizontal: 32),
                           shape: RoundedRectangleBorder(

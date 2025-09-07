@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           // Gradient background
@@ -48,9 +48,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.red.shade700,
-                  Colors.red.shade400,
-                  Colors.orange.shade200
+                  Color(0xFFE50914), // Netflix red
+                  Color(0xFFB81D24), // Darker red
+                  Colors.black
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -136,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade700,
+                        backgroundColor: Color(0xFFE50914), // Netflix red
                         minimumSize: const Size(double.infinity, 48),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
+            color: Colors.grey[800],
             borderRadius: BorderRadius.circular(10),
           ),
           padding: const EdgeInsets.all(8),
@@ -223,7 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
-                  color: Colors.black54,
+                  color: Colors.grey,
                 ),
               ),
               const SizedBox(height: 2),
@@ -232,7 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 17,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
             ],

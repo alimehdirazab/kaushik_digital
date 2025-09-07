@@ -11,7 +11,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AccountService accountService = AccountService();
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       appBar: AppBar(
           iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: primaryColor,

@@ -25,6 +25,7 @@ class _CustomListtileState extends State<CustomListtile> {
           leading: Icon(
             widget.icon,
             size: h * 0.042,
+            color: Colors.grey[400],
           ),
           title: Text(
             widget.text,
@@ -32,12 +33,13 @@ class _CustomListtileState extends State<CustomListtile> {
               textStyle: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black),
+                  color: Colors.white),
             ),
           ),
           trailing: Icon(
             Icons.arrow_forward_ios_rounded,
             size: h * 0.04,
+            color: Colors.grey[400],
           ),
         ),
       ),

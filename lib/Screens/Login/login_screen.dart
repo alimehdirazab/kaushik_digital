@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     double w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Set white background
+      backgroundColor: Colors.black, // Netflix dark background
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [
@@ -55,10 +55,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Text('Login',
                       style: GoogleFonts.montserrat(
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: primaryColor),
+                            color: Colors.white), // White text for dark mode
                       )),
                   SizedBox(height: h * 0.025),
                   Form(
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
+                                backgroundColor: const Color(0xffE50914), // Netflix red
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 12, horizontal: 32),
                                 shape: RoundedRectangleBorder(
@@ -126,9 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'Need help?',
                     style: GoogleFonts.namdhinggo(
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                             fontSize: 18,
-                            color: primaryColor,
+                            color: Colors.white70, // Light gray for dark mode
                             fontWeight: FontWeight.bold)),
                   ),
                   SizedBox(
@@ -140,9 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         'New to App? ',
                         style: GoogleFonts.namdhinggo(
-                            textStyle: TextStyle(
+                            textStyle: const TextStyle(
                                 fontSize: 18,
-                                color: primaryColor,
+                                color: Colors.white70,
                                 fontWeight: FontWeight.bold)),
                       ),
                       GestureDetector(
@@ -154,11 +154,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text('Sign up now',
                             style: GoogleFonts.namdhinggo(
-                              textStyle: TextStyle(
+                              textStyle: const TextStyle(
                                   decoration: TextDecoration.underline,
-                                  decorationColor: primaryColor,
+                                  decorationColor: Color(0xffE50914),
                                   fontSize: 18,
-                                  color: primaryColor,
+                                  color: Color(0xffE50914), // Netflix red
                                   fontWeight: FontWeight.bold),
                             )),
                       ),
@@ -170,9 +170,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'or',
                     style: GoogleFonts.namdhinggo(
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                             fontSize: 18,
-                            color: primaryColor,
+                            color: Colors.white70,
                             fontWeight: FontWeight.bold)),
                   ),
                   SizedBox(
@@ -190,11 +190,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text('Login with OTP',
                             style: GoogleFonts.namdhinggo(
-                              textStyle: TextStyle(
+                              textStyle: const TextStyle(
                                   decoration: TextDecoration.underline,
-                                  decorationColor: primaryColor,
+                                  decorationColor: Color(0xffE50914),
                                   fontSize: 18,
-                                  color: primaryColor,
+                                  color: Color(0xffE50914), // Netflix red
                                   fontWeight: FontWeight.bold),
                             )),
                       ),

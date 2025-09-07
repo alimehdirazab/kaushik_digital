@@ -62,10 +62,21 @@ class _SplashScreenState extends State<SplashScreen> {
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.black,
         body: Container(
-          color: whiteColor,
+          color: Colors.black,
           child: Center(
-            child: Image.asset(appLogo, height: h * 0.25),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(appLogo, height: h * 0.25),
+                const SizedBox(height: 20),
+                // const CircularProgressIndicator(
+                //   color: Color(0xffE50914),
+                //   strokeWidth: 3,
+                // ),
+              ],
+            ),
           ),
         ),
       ),

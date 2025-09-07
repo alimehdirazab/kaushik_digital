@@ -69,6 +69,7 @@ class _MyListScreenState extends State<MyListScreen> {
         context: context,
         removeTop: true,
         child: Scaffold(
+          backgroundColor: Colors.black,
           body: Padding(
             padding:
                 const EdgeInsets.only(top: 26, left: 8, right: 8, bottom: 20),
@@ -99,7 +100,7 @@ class _MyListScreenState extends State<MyListScreen> {
                               style: GoogleFonts.roboto(
                                 textStyle: const TextStyle(
                                   fontSize: 17,
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ))
@@ -115,7 +116,7 @@ class _MyListScreenState extends State<MyListScreen> {
                           textStyle: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black),
+                              color: Colors.white),
                         )),
                   ),
                   // SizedBox(
