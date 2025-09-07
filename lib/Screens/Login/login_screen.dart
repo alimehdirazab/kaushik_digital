@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kaushik_digital/Providers/auth_provider.dart';
 import 'package:kaushik_digital/Screens/Login%20with%20OTP/ph_no_screen.dart';
 import 'package:kaushik_digital/Screens/Login/widgets/custom_textfield.dart';
-import 'package:kaushik_digital/Screens/Signup/signup_phno_screen.dart';
 import 'package:kaushik_digital/Screens/Signup/signup_screen.dart';
 import 'package:kaushik_digital/utils/constants/constants.dart';
 import 'package:provider/provider.dart';
@@ -120,17 +119,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       )),
-                  SizedBox(
-                    height: h * 0.025,
-                  ),
-                  Text(
-                    'Need help?',
-                    style: GoogleFonts.namdhinggo(
-                        textStyle: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white70, // Light gray for dark mode
-                            fontWeight: FontWeight.bold)),
-                  ),
                   SizedBox(
                     height: h * 0.025,
                   ),

@@ -26,98 +26,169 @@ class _PhNoScreenState extends State<PhNoScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     double h = MediaQuery.of(context).size.height;
-    double w = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        toolbarHeight: 65,
-        centerTitle: true,
-        title: Text("Phone ",
-            style: GoogleFonts.montserrat(
-              textStyle: TextStyle(
-                fontSize: 19,
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: h * 0.02,
-            ),
-            Center(
-              child: Text("Enter your phone number",
-                  style: GoogleFonts.abel(
-                    textStyle: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )),
-            ),
-            SizedBox(
-              height: h * 0.03,
-            ),
-            SizedBox(
-                width: w * 0.75,
-                child: Form(
-                  key: _formKey,
-                  child: PhNoTextfield(
-                    controller: PhoneController,
-                  ),
-                )),
-            SizedBox(
-              height: h * 0.025,
-            ),
-            SizedBox(
-              width: w * 0.75,
-              height: h * 0.065,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // AuthService authService = AuthService();
-                    // authService.requestLoginOTP(
-                    //     mobile: PhoneController.text.trim(), context: context);
-                    authProvider.requestLoginOTP(
-                        mobile: PhoneController.text.trim(), context: context);
-                  }
-                  print(PhoneController.text);
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => OtpScreen(
-                  //               phNo: PhoneController.text,
-                  //             )));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: authProvider.isLoading
-                    ? SizedBox(
-                        height: h * 0.03,
-                        width: h * 0.03,
-                        child: CircularProgressIndicator(
-                          color: whiteColor,
-                          strokeWidth: 3,
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                // Top section with logo
+                SizedBox(height: h * 0.05),
+                Image.asset(
+                  appLogo,
+                  height: 60,
+                  width: 60,
+                ),  
+                // Main content container
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Welcome text
+                      Text(
+                        "Welcome Back",
+                        style: GoogleFonts.inter(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
                         ),
-                      )
-                    : Text(
-                        'Next',
-                        style: GoogleFonts.namdhinggo(
-                          textStyle: TextStyle(fontSize: 18, color: whiteColor),
+                        textAlign: TextAlign.center,
+                      ),
+                      
+                      SizedBox(height: h * 0.015),
+                      
+                      Text(
+                        "Enter your phone number to continue",
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey[400],
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      
+                      SizedBox(height: h * 0.05),
+                      
+                      // Phone number input container
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[900]?.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.grey[800]!,
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Phone Number",
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                            
+                            SizedBox(height: h * 0.02),
+                            
+                            Form(
+                              key: _formKey,
+                              child: PhNoTextfield(
+                                controller: PhoneController,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-              ),
+                      
+                      SizedBox(height: h * 0.04),
+                      
+                      // Continue button
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFFE50914),
+                              Color(0xFFB81D24),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFE50914).withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              authProvider.requestLoginOTP(
+                                  mobile: PhoneController.text.trim(), context: context);
+                            }
+                            print(PhoneController.text);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: authProvider.isLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : Text(
+                                  'Continue',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      
+                      SizedBox(height: h * 0.03),
+                      
+                      // Privacy text
+                      Text(
+                        "We'll send you a verification code via SMS",
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: Colors.grey[500],
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Bottom padding
+                SizedBox(height: h * 0.04),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

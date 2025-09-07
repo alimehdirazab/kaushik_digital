@@ -25,7 +25,7 @@ class PhNoTextfield extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.number,
-      maxLength: 10, // Limit input to 10 digits
+     // maxLength: 10, // Limit input to 10 digits
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly, // Allow only numbers
       ],

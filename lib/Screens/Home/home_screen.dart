@@ -258,7 +258,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                         child: Container(
                                           height: 45,
                                           decoration: BoxDecoration(
-                                            color: Colors.grey[800]!.withOpacity(0.8),
+                                            color: Colors.grey[800]!.withValues(alpha: 0.8),
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Row(
@@ -288,7 +288,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                         height: 45,
                                         width: 45,
                                         decoration: BoxDecoration(
-                                          color: Colors.grey[800]!.withOpacity(0.8),
+                                          color: Colors.grey[800]!.withValues(alpha: 0.8),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: const Icon(
@@ -318,7 +318,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                     decoration: BoxDecoration(
                                       color: _currentSliderIndex == entry.key
                                           ? const Color(0xffE50914)
-                                          : Colors.white.withOpacity(0.4),
+                                          : Colors.white.withValues(alpha:0.4),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                   );
@@ -395,9 +395,9 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      
-                      // Latest Movies Section
-                      _buildSectionTitle("Latest Movies"),
+
+                      // Featured Movies Section
+                      _buildSectionTitle("Featured Movies"),
                       const SizedBox(height: 12),
                       SizedBox(
                         height: h * 0.28,
@@ -435,9 +435,9 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                       ),
                       
                       const SizedBox(height: 30),
-                      
-                      // Latest Shows Section
-                      _buildSectionTitle("Latest Shows"),
+
+                      // Web Series Section
+                      _buildSectionTitle("Web Series"),
                       const SizedBox(height: 12),
                       SizedBox(
                         height: h * 0.28,

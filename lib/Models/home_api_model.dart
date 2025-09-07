@@ -18,16 +18,16 @@ class VideoStreamingApp {
       slider: (json['slider'] as List?)
           ?.map((item) => SliderItem.fromJson(item))
           .toList() ?? [],
-      latestMovies: (json['latest_movies'] as List?)
+      latestMovies: (json['featured_movies'] as List?)
           ?.map((item) => Movie.fromJson(item))
           .toList() ?? [],
-      latestShows: (json['latest_shows'] as List?)
+      latestShows: (json['web_series'] as List?)
           ?.map((item) => Show.fromJson(item))
           .toList() ?? [],
-      popularMovies: (json['popular_movies'] as List?)
+      popularMovies: (json['short_movies'] as List?)
           ?.map((item) => Movie.fromJson(item))
           .toList() ?? [],
-      popularShows: (json['popular_shows'] as List?)
+      popularShows: (json['video_albums'] as List?)
           ?.map((item) => Show.fromJson(item))
           .toList() ?? [],
     );
