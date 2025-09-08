@@ -477,12 +477,12 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                       const SizedBox(height: 30),
                       
                       // Popular Movies Section
-                      _buildSectionTitle("Popular Movies"),
+                      _buildSectionTitle("Shot Flims"),
                       const SizedBox(height: 12),
                       SizedBox(
                         height: h * 0.28,
                         child: movieData.popularMovies.isEmpty
-                            ? _buildEmptyState("No movies available.")
+                            ? _buildEmptyState("No Flims available.")
                             : ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 padding: const EdgeInsets.only(left: 16),
@@ -515,14 +515,14 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                       ),
                       
                       const SizedBox(height: 30),
-                      
-                      // Popular Shows Section
-                      _buildSectionTitle("Popular Shows"),
+
+                      // Video Albums Section
+                      _buildSectionTitle("Video Albums"),
                       const SizedBox(height: 12),
                       SizedBox(
                         height: h * 0.28,
                         child: movieData.popularShows.isEmpty
-                            ? _buildEmptyState("No shows available.")
+                            ? _buildEmptyState("No Albums available.")
                             : ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 padding: const EdgeInsets.only(left: 16),
@@ -555,7 +555,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                       ),
                       
                       const SizedBox(height: 30),
-                      
+                      // Recently Watched Section
+                       _buildSectionTitle("Recently Watched"),
                       // All Shows Section
                       _buildSectionTitle("All Shows"),
                       const SizedBox(height: 12),

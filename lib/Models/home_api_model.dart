@@ -14,23 +14,71 @@ class VideoStreamingApp {
   });
 
   factory VideoStreamingApp.fromJson(Map<String, dynamic> json) {
+    // Handle the nested VIDEO_STREAMING_APP structure
+    final appData = json['VIDEO_STREAMING_APP'] as Map<String, dynamic>? ?? json;
+    
     return VideoStreamingApp(
-      slider: (json['slider'] as List?)
-          ?.map((item) => SliderItem.fromJson(item))
-          .toList() ?? [],
-      latestMovies: (json['featured_movies'] as List?)
-          ?.map((item) => Movie.fromJson(item))
-          .toList() ?? [],
-      latestShows: (json['web_series'] as List?)
-          ?.map((item) => Show.fromJson(item))
-          .toList() ?? [],
-      popularMovies: (json['short_movies'] as List?)
-          ?.map((item) => Movie.fromJson(item))
-          .toList() ?? [],
-      popularShows: (json['video_albums'] as List?)
-          ?.map((item) => Show.fromJson(item))
-          .toList() ?? [],
+      slider: _parseSlider(appData['slider']),
+      latestMovies: _parseMovies(appData['featured_movies']),
+      latestShows: _parseShows(appData['web_series']),
+      popularMovies: _parseMoviesFromAlbums(appData['short_movies']),
+      popularShows: _parseShowsFromAlbums(appData['video_albums']),
     );
+  }
+
+  // Helper method to safely parse slider data
+  static List<SliderItem> _parseSlider(dynamic sliderData) {
+    if (sliderData is List) {
+      return sliderData
+          .where((item) => item is Map<String, dynamic>)
+          .map((item) => SliderItem.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+
+  // Helper method to safely parse movies data
+  static List<Movie> _parseMovies(dynamic moviesData) {
+    if (moviesData is List) {
+      return moviesData
+          .where((item) => item is Map<String, dynamic>)
+          .map((item) => Movie.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+
+  // Helper method to safely parse shows data
+  static List<Show> _parseShows(dynamic showsData) {
+    if (showsData is List) {
+      return showsData
+          .where((item) => item is Map<String, dynamic>)
+          .map((item) => Show.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+
+  // Helper method to parse movies from album format
+  static List<Movie> _parseMoviesFromAlbums(dynamic albumsData) {
+    if (albumsData is List) {
+      return albumsData
+          .where((item) => item is Map<String, dynamic>)
+          .map((item) => Movie.fromAlbumJson(item as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+
+  // Helper method to parse shows from album format
+  static List<Show> _parseShowsFromAlbums(dynamic albumsData) {
+    if (albumsData is List) {
+      return albumsData
+          .where((item) => item is Map<String, dynamic>)
+          .map((item) => Show.fromAlbumJson(item as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
   }
 }
 
@@ -90,6 +138,20 @@ class Movie {
       videoType: json['video_type'],
     );
   }
+
+  // Factory constructor for album format (used by short_movies)
+  factory Movie.fromAlbumJson(Map<String, dynamic> json) {
+    return Movie(
+      movieId: json['album_id'],
+      movieTitle: json['album_title'] ?? '',
+      moviePoster: json['album_poster'] ?? '',
+      movieDuration: json['album_duration'] ?? '',
+      movieAccess: json['album_access'] ?? '',
+      moviePrice: json['price'],
+      movieUrl: json['album_url'],
+      videoType: json['video_type'],
+    );
+  }
 }
 
 class Show {
@@ -110,6 +172,16 @@ class Show {
       showId: json['show_id'],
       showTitle: json['show_title'] ?? '',
       showPoster: json['show_poster'] ?? '',
+      showPrice: json['price'],
+    );
+  }
+
+  // Factory constructor for album format (used by video_albums)
+  factory Show.fromAlbumJson(Map<String, dynamic> json) {
+    return Show(
+      showId: json['album_id'],
+      showTitle: json['album_title'] ?? '',
+      showPoster: json['album_poster'] ?? '',
       showPrice: json['price'],
     );
   }
