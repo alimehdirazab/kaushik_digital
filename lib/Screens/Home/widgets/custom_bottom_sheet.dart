@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaushik_digital/Models/order_model.dart';
+import 'package:kaushik_digital/Models/payment_verification_model.dart';
 import 'package:kaushik_digital/Providers/profile_detail_provider.dart';
 import 'package:kaushik_digital/Screens/Detail%20screen/sampleplayer.dart';
 import 'package:kaushik_digital/Services/razorpay_service.dart';
@@ -73,10 +74,11 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
   Future<void> initiatePayment() async {
     try {
       final OrderModel? order =
-          await razorpayService.createOrder(amount: (widget.moviePrice ?? 0).toInt(), context: widget.context);
+          await razorpayService.createOrder(amount: (widget.moviePrice ?? 0).toInt(), context: context);
       if (order?.orderId == null) {
-        snackbar("Error Creating Error ", context);
+        snackbar("Error Creating Order", context);
         Navigator.pop(context);
+        return;
       }
       if (order!.orderId.isNotEmpty) {
         _paymentTimer = Timer(const Duration(seconds: 1), () async {
@@ -86,6 +88,7 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
           await RazorpayService.checkOutOrder(
               orderModel: order,
               onSuccess: (response) async {
+                print("Payment success callback triggered");
                 if (mounted) {
                   // Get user provider for actual user ID
                   final userProvider = Provider.of<ProfileDetailProvider>(context, listen: false);
@@ -100,10 +103,22 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
                     context: context,
                   );
                   
-                  if (verificationResult != null && verificationResult.success) {
+                  if (verificationResult != null && verificationResult.success == true) {
+                    print("Payment verified successfully, navigating to video player");
+                    print("Verification Result: ${verificationResult.toJson()}");
+                    
+                    // Show success message
                     snackbar("Payment Successful", context);
-                    print("Registration ID: ${verificationResult.regId}");
-                    Navigator.pop(context);
+                    
+                    // Pop the bottom sheet first
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                    
+                    // Small delay to ensure bottom sheet is closed
+                    await Future.delayed(const Duration(milliseconds: 100));
+                    
+                    // Navigate to video player
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -117,35 +132,36 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
                     print("Order ID ${response.orderId}");
                     print("Payment ID ${response.paymentId}");
                     print("Payment Signature ${response.signature}");
-                    print("Verification Result: ${verificationResult.toJson()}");
                   } else {
+                    print("Payment verification failed");
+                    print("Verification Result: ${verificationResult?.toJson()}");
+                    print("Success field: ${verificationResult?.success}");
                     snackbar(verificationResult?.message ?? "Payment verification failed", context);
                   }
+                } else {
+                  print("Widget not mounted when payment success callback triggered");
                 }
               },
               onFailure: (response) {
+                print("Payment failure callback triggered");
                 if (mounted) {
                   snackbar("Payment Failed!", context);
+                  print("Payment failed: ${response.code} - ${response.message}");
                 }
                 print("**********************************");
                 print(response.code);
                 print(response.error);
                 print(response.message);
-                Navigator.pop(context);
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
               },
               context: context);
-          // openCheckout(
-          //   amount: order.amount,
-          //   name: userDetails.name!,
-          //   contact: userDetails.phone!,
-          //   email: userDetails.email!,
-          //   orderId: order.orderId.toString(),
-          // );
         });
       }
     } catch (error) {
       print('Error creating order: $error');
-      snackbar("Error creating order", widget.context);
+      snackbar("Error creating order", context);
     }
   }
 

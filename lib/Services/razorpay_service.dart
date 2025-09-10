@@ -27,9 +27,9 @@ class RazorpayService {
     var options = {
       'key': 'rzp_test_hOZCibf5Ibk62K', // YE ORIGNAL API KEY HAI NOT WORKING
       // 'key': 'rzp_test_09AVqbkjcSmzKv', // YE WORK KRR RAHI HAI ROHIT SEMRIWAL KI API KEY HAI
-      'amount': 500, // Amount in paise (₹500)
+      'amount': orderModel.amount, // Amount in paise from order model
       'name': userProvider.name, // Dynamic user name
-      'description': 'Purchase of Fine T-Shirt',
+      'description': 'Purchase of Movie',
       'order_id': orderModel.orderId, // Use a valid order ID
       'currency': 'INR', // Ensure currency matches the Razorpay order
       'prefill': {
@@ -124,7 +124,7 @@ class RazorpayService {
         Uri.parse('$uri/create-order'),
         headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode({
-          'amount': amount * 100, // Convert to paise
+          'amount': amount, // Convert to paise
           'user_id': Provider.of<ProfileDetailProvider>(context, listen: false).userId,
         }),
       );
