@@ -11,6 +11,26 @@ import 'package:kaushik_digital/utils/constants/constants.dart';
 import 'package:kaushik_digital/utils/constants/snackbar.dart';
 import 'package:provider/provider.dart';
 
+// Payment State Provider
+class PaymentStateProvider extends ChangeNotifier {
+  bool _isProcessingPayment = false;
+  String _paymentStatus = '';
+  
+  bool get isProcessingPayment => _isProcessingPayment;
+  String get paymentStatus => _paymentStatus;
+  
+  void setProcessingPayment(bool processing, [String status = '']) {
+    _isProcessingPayment = processing;
+    _paymentStatus = status;
+    notifyListeners();
+  }
+  
+  void updateStatus(String status) {
+    _paymentStatus = status;
+    notifyListeners();
+  }
+}
+
 class MovieBottomSheet extends StatefulWidget {
   final String movieName;
   final String duration;
@@ -36,20 +56,18 @@ class MovieBottomSheet extends StatefulWidget {
 }
 
 class _MovieBottomSheetState extends State<MovieBottomSheet> {
-  // final Razorpay razorpay = Razorpay();
-  // razorpay = Razorpay();
   Timer? _paymentTimer;
+  final RazorpayService razorpayService = RazorpayService();
+  late PaymentStateProvider paymentProvider;
 
   @override
   void initState() {
     super.initState();
-    // RazorpayService.razorPay;
+    paymentProvider = PaymentStateProvider();
   }
 
-  final RazorpayService razorpayService = RazorpayService();
-
   // Check if movie is free and handle accordingly
-  void handleMovieAccess() {
+  void handleMovieAccess() async {
     final moviePrice = widget.moviePrice ?? 0;
     
     if (moviePrice == 0 || moviePrice == 0.0) {
@@ -58,108 +76,137 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => VideoPlayerScreen(
-            movieTitle: widget.movieName,
-            movieId: widget.movieId,
-            movieUrl: widget.movieUrl,
+          builder: (context) => ChangeNotifierProvider(
+            create: (context) => VideoPlayerStateProvider(),
+            child: VideoPlayerScreen(
+              movieTitle: widget.movieName,
+              movieId: widget.movieId,
+              movieUrl: widget.movieUrl,
+            ),
           ),
         ),
       );
     } else {
-      // Paid movie - initiate payment
-      initiatePayment();
+      // Paid movie - initiate payment with loading state
+      await initiatePayment();
     }
   }
 
   Future<void> initiatePayment() async {
     try {
-      final OrderModel? order =
-          await razorpayService.createOrder(amount: (widget.moviePrice ?? 0).toInt(), context: context);
+      // Set loading state
+      paymentProvider.setProcessingPayment(true, 'Creating order...');
+      
+      // Pre-fetch user details to avoid delays during payment
+      final userProvider = Provider.of<ProfileDetailProvider>(context, listen: false);
+      
+      final OrderModel? order = await razorpayService.createOrder(
+        amount: (widget.moviePrice ?? 0).toInt(), 
+        context: context
+      );
+      
       if (order?.orderId == null) {
+        paymentProvider.setProcessingPayment(false);
         snackbar("Error Creating Order", context);
         Navigator.pop(context);
         return;
       }
+      
       if (order!.orderId.isNotEmpty) {
-        _paymentTimer = Timer(const Duration(seconds: 1), () async {
-          // Check if widget is still mounted before proceeding
+        paymentProvider.updateStatus('Opening payment gateway...');
+        
+        // Reduced delay for faster payment initialization
+        _paymentTimer = Timer(const Duration(milliseconds: 300), () async {
           if (!mounted) return;
           
           await RazorpayService.checkOutOrder(
-              orderModel: order,
-              onSuccess: (response) async {
-                print("Payment success callback triggered");
-                if (mounted) {
-                  // Get user provider for actual user ID
-                  final userProvider = Provider.of<ProfileDetailProvider>(context, listen: false);
+            orderModel: order,
+            onSuccess: (response) async {
+              paymentProvider.updateStatus('Verifying payment...');
+              print("Payment success callback triggered");
+              
+              if (mounted) {
+                // Verify payment after successful Razorpay response
+                final verificationResult = await razorpayService.verifyPayment(
+                  razorpaySignature: response.signature ?? '',
+                  razorpayPaymentId: response.paymentId ?? '',
+                  razorpayOrderId: response.orderId ?? '',
+                  userId: userProvider.userId ?? 126,
+                  movieId: widget.movieId ?? 20,
+                  context: context,
+                );
+                
+                if (verificationResult != null && verificationResult.success == true) {
+                  paymentProvider.updateStatus('Payment successful!');
+                  print("Payment verified successfully, navigating to video player");
+                  print("Verification Result: ${verificationResult.toJson()}");
                   
-                  // Verify payment after successful Razorpay response
-                  final verificationResult = await razorpayService.verifyPayment(
-                    razorpaySignature: response.signature ?? '',
-                    razorpayPaymentId: response.paymentId ?? '',
-                    razorpayOrderId: response.orderId ?? '',
-                    userId: userProvider.userId ?? 126, // Use actual user ID or fallback
-                    movieId: widget.movieId ?? 20, // Use actual movie ID or fallback
-                    context: context,
-                  );
+                  // Show success message
+                  snackbar("Payment Successful", context);
                   
-                  if (verificationResult != null && verificationResult.success == true) {
-                    print("Payment verified successfully, navigating to video player");
-                    print("Verification Result: ${verificationResult.toJson()}");
-                    
-                    // Show success message
-                    snackbar("Payment Successful", context);
-                    
-                    // Pop the bottom sheet first
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                    
-                    // Small delay to ensure bottom sheet is closed
-                    await Future.delayed(const Duration(milliseconds: 100));
-                    
-                    // Navigate to video player
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => VideoPlayerScreen(
-                              movieTitle: widget.movieName,
-                              movieId: widget.movieId,
-                              movieUrl: widget.movieUrl,
-                            )));
-
-                    print("Payment Data ${response.data}");
-                    print("Order ID ${response.orderId}");
-                    print("Payment ID ${response.paymentId}");
-                    print("Payment Signature ${response.signature}");
-                  } else {
-                    print("Payment verification failed");
-                    print("Verification Result: ${verificationResult?.toJson()}");
-                    print("Success field: ${verificationResult?.success}");
-                    snackbar(verificationResult?.message ?? "Payment verification failed", context);
+                  // Reset loading state
+                  paymentProvider.setProcessingPayment(false);
+                  
+                  // Pop the bottom sheet first
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
                   }
+                  
+                  // Small delay to ensure bottom sheet is closed
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  
+                  // Navigate to video player
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChangeNotifierProvider(
+                        create: (context) => VideoPlayerStateProvider(),
+                        child: VideoPlayerScreen(
+                          movieTitle: widget.movieName,
+                          movieId: widget.movieId,
+                          movieUrl: widget.movieUrl,
+                        ),
+                      )
+                    )
+                  );
+
+                  print("Payment Data ${response.data}");
+                  print("Order ID ${response.orderId}");
+                  print("Payment ID ${response.paymentId}");
+                  print("Payment Signature ${response.signature}");
                 } else {
-                  print("Widget not mounted when payment success callback triggered");
+                  paymentProvider.setProcessingPayment(false);
+                  print("Payment verification failed");
+                  print("Verification Result: ${verificationResult?.toJson()}");
+                  print("Success field: ${verificationResult?.success}");
+                  snackbar(verificationResult?.message ?? "Payment verification failed", context);
                 }
-              },
-              onFailure: (response) {
-                print("Payment failure callback triggered");
-                if (mounted) {
-                  snackbar("Payment Failed!", context);
-                  print("Payment failed: ${response.code} - ${response.message}");
-                }
-                print("**********************************");
-                print(response.code);
-                print(response.error);
-                print(response.message);
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                }
-              },
-              context: context);
+              } else {
+                paymentProvider.setProcessingPayment(false);
+                print("Widget not mounted when payment success callback triggered");
+              }
+            },
+            onFailure: (response) {
+              paymentProvider.setProcessingPayment(false);
+              print("Payment failure callback triggered");
+              if (mounted) {
+                snackbar("Payment Failed!", context);
+                print("Payment failed: ${response.code} - ${response.message}");
+              }
+              print("**********************************");
+              print(response.code);
+              print(response.error);
+              print(response.message);
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            },
+            context: context
+          );
         });
       }
     } catch (error) {
+      paymentProvider.setProcessingPayment(false);
       print('Error creating order: $error');
       snackbar("Error creating order", context);
     }
@@ -173,127 +220,186 @@ class _MovieBottomSheetState extends State<MovieBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
 
-    return Container(
-      height: h * 0.3,
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 233, 230, 230),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-                left: 20, right: 20, top: h * 0.025, bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Buy Now",
-                  style: GoogleFonts.roboto(
-                    textStyle: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  ),
-                ),
-                Text(
-                  "Price ${widget.moviePrice ?? 0} INR",
-                  style: GoogleFonts.roboto(
-                    textStyle: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  ),
-                ),
-              ],
-            ),
+    return ChangeNotifierProvider<PaymentStateProvider>(
+      create: (_) => paymentProvider,
+      child: Container(
+        height: h * 0.3,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 233, 230, 230),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-            child: Container(
-              height: h * 0.13,
-              decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(20)),
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Movie Details - Flexible
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        child: Consumer<PaymentStateProvider>(
+          builder: (context, paymentState, child) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: 20, right: 20, top: h * 0.025, bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Buy Now",
+                        style: GoogleFonts.roboto(
+                          textStyle: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black),
+                        ),
+                      ),
+                      Text(
+                        "Price ${widget.moviePrice ?? 0} INR",
+                        style: GoogleFonts.roboto(
+                          textStyle: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                  child: Container(
+                    height: h * 0.13,
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          widget.movieName,
-                          maxLines: 2,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.namdhinggo(
-                            textStyle: TextStyle(
-                                fontSize: h * 0.022,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black),
+                        // Movie Details - Flexible
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.movieName,
+                                maxLines: 2,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.namdhinggo(
+                                  textStyle: TextStyle(
+                                      fontSize: h * 0.022,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black),
+                                ),
+                              ),
+                              Text(
+                                "Duration : ${widget.duration}",
+                                style: GoogleFonts.namdhinggo(
+                                  textStyle: TextStyle(
+                                      fontSize: h * 0.019,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          "Duration : ${widget.duration}",
-                          style: GoogleFonts.namdhinggo(
-                            textStyle: TextStyle(
-                                fontSize: h * 0.019,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black),
+                        const SizedBox(width: 8),
+                        // Button - Flexible with Loading State
+                        Expanded(
+                          flex: 2,
+                          child: GestureDetector(
+                            onTap: paymentState.isProcessingPayment 
+                                ? null 
+                                : () async {
+                                    handleMovieAccess();
+                                  },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              decoration: BoxDecoration(
+                                  color: paymentState.isProcessingPayment 
+                                      ? Colors.grey[400] 
+                                      : primaryColor,
+                                  borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 13),
+                              child: paymentState.isProcessingPayment
+                                  ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: Text(
+                                            paymentState.paymentStatus.isEmpty 
+                                                ? "Processing..." 
+                                                : paymentState.paymentStatus,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.namdhinggo(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      (widget.moviePrice == null || widget.moviePrice == 0) 
+                                          ? "Watch Free" 
+                                          : "Pay ₹${widget.moviePrice}",
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.namdhinggo(
+                                        textStyle: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  // Button - Flexible
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () async {
-                        handleMovieAccess();
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: primaryColor,
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 13),
-                        child: Text(
-                          (widget.moviePrice == null || widget.moviePrice == 0) 
-                              ? "Watch Free" 
-                              : "Pay ₹${widget.moviePrice}",
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.namdhinggo(
-                            textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white),
-                          ),
+                ),
+                // Loading Status Text
+                if (paymentState.isProcessingPayment && paymentState.paymentStatus.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      paymentState.paymentStatus,
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ],
+              ],
+            );
+          },
+        ),
       ),
     );
   }

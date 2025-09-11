@@ -8,6 +8,7 @@ import 'package:kaushik_digital/Screens/Home/widgets/custom_movie_container.dart
 import 'package:kaushik_digital/Services/home_service.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:kaushik_digital/Screens/Detail%20screen/sampleplayer.dart';
 
 class MyHomeScreen extends StatefulWidget {
@@ -20,7 +21,6 @@ class MyHomeScreen extends StatefulWidget {
 class _MyHomeScreenState extends State<MyHomeScreen> {
   HomeService homeService = HomeService();
   bool _didFetch = false;
-  int _currentSliderIndex = 0;
   Future<Map<String, dynamic>>? _showsFuture;
 
   @override
@@ -97,53 +97,43 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                           fit: StackFit.expand,
                           children: [
                             // Carousel Banner Slider
-                            CarouselSlider.builder(
-                              itemCount: movieData.slider.length,
-                              options: CarouselOptions(
-                                height: h * 0.75,
-                                viewportFraction: 1.0,
-                                autoPlay: true,
-                                autoPlayInterval: const Duration(seconds: 4),
-                                autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                                autoPlayCurve: Curves.fastOutSlowIn,
-                                enableInfiniteScroll: true,
-                                scrollPhysics: const BouncingScrollPhysics(),
-                                pauseAutoPlayOnTouch: true,
-                                pauseAutoPlayOnManualNavigate: true,
-                                onPageChanged: (index, reason) {
-                                  setState(() {
-                                    _currentSliderIndex = index;
-                                  });
-                                },
-                              ),
-                              itemBuilder: (context, index, realIndex) {
-                                final sliderItem = movieData.slider[index];
-                                return Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(sliderItem.sliderImage),
-                                      fit: BoxFit.fill,
-                                      onError: (error, stackTrace) {
-                                        print('Error loading image: $error');
-                                      },
-                                    ),
+                            Consumer<HomeDataProvider>(
+                              builder: (context, provider, _) {
+                                return CarouselSlider.builder(
+                                  itemCount: movieData.slider.length,
+                                  options: CarouselOptions(
+                                    height: h * 0.75,
+                                    viewportFraction: 1.0,
+                                    autoPlay: true,
+                                    autoPlayInterval: const Duration(seconds: 4),
+                                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                                    autoPlayCurve: Curves.fastOutSlowIn,
+                                    enableInfiniteScroll: true,
+                                    scrollPhysics: const BouncingScrollPhysics(),
+                                    pauseAutoPlayOnTouch: true,
+                                    pauseAutoPlayOnManualNavigate: true,
+                                    onPageChanged: (index, reason) {
+                                      provider.sliderIndex = index;
+                                    },
                                   ),
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.transparent,
-                                          Colors.black26,
-                                          Colors.black54,
-                                        ],
-                                        stops: [0.0, 0.5, 0.8, 1.0],
+                                  itemBuilder: (context, index, realIndex) {
+                                    final sliderItem = movieData.slider[index];
+                                    return Container(
+                                      width: double.infinity,
+                                      child: CachedNetworkImage(
+                                        imageUrl: sliderItem.sliderImage,
+                                        fit: BoxFit.fill,
+                                        placeholder: (context, url) => Container(
+                                          color: Colors.grey[900],
+                                          child: const Center(child: CircularProgressIndicator()),
+                                        ),
+                                        errorWidget: (context, url, error) => Container(
+                                          color: Colors.grey[900],
+                                          child: const Icon(Icons.broken_image, color: Colors.white54, size: 50),
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 );
                               },
                             ),
@@ -175,17 +165,21 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                 children: [
                                  
                                   // Series/Movie title (Dynamic based on current slide)
-                                  Text(
-                                    movieData.slider.isNotEmpty 
-                                      ? movieData.slider[_currentSliderIndex].sliderTitle
-                                      : 'Featured Content',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                                  Consumer<HomeDataProvider>(
+                                    builder: (context, provider, _) {
+                                      return Text(
+                                        movieData.slider.isNotEmpty 
+                                          ? movieData.slider[provider.sliderIndex].sliderTitle
+                                          : 'Featured Content',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 8),
                                   // Subtitle/Description
@@ -208,16 +202,19 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                           onTap: () {
                                             // Handle play action for slider
                                             if (movieData.slider.isNotEmpty) {
-                                              final currentSlider = movieData.slider[_currentSliderIndex];
+                                              final currentSlider = movieData.slider[Provider.of<HomeDataProvider>(context, listen: false).sliderIndex];
                                               
                                               // For sliders, directly navigate to video player since they're typically free
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => VideoPlayerScreen(
-                                                    movieTitle: currentSlider.sliderTitle,
-                                                    movieId: currentSlider.sliderPostId,
-                                                    movieUrl: null, // Will use fallback video URL
+                                                  builder: (context) => ChangeNotifierProvider(
+                                                    create: (context) => VideoPlayerStateProvider(),
+                                                    child: VideoPlayerScreen(
+                                                      movieTitle: currentSlider.sliderTitle,
+                                                      movieId: currentSlider.sliderPostId,
+                                                      movieUrl: null, // Will use fallback video URL
+                                                    ),
                                                   ),
                                                 ),
                                               );
@@ -303,27 +300,31 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                               ),
                             ),
                             // Carousel Indicators
-                            Positioned(
-                              bottom: 15,
-                              left: 0,
-                              right: 0,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: movieData.slider.asMap().entries.map((entry) {
-                                  return AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    width: _currentSliderIndex == entry.key ? 24 : 8,
-                                    height: 8,
-                                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                                    decoration: BoxDecoration(
-                                      color: _currentSliderIndex == entry.key
-                                          ? const Color(0xffE50914)
-                                          : Colors.white.withValues(alpha:0.4),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
+                            Consumer<HomeDataProvider>(
+                              builder: (context, provider, _) {
+                                return Positioned(
+                                  bottom: 15,
+                                  left: 0,
+                                  right: 0,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: movieData.slider.asMap().entries.map((entry) {
+                                      return AnimatedContainer(
+                                        duration: const Duration(milliseconds: 300),
+                                        width: provider.sliderIndex == entry.key ? 24 : 8,
+                                        height: 8,
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                                        decoration: BoxDecoration(
+                                          color: provider.sliderIndex == entry.key
+                                              ? const Color(0xffE50914)
+                                              : Colors.white.withValues(alpha:0.4),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                );
+                              },
                             ),
                             // Top gradient for status bar
                             Container(
@@ -407,6 +408,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                                 scrollDirection: Axis.horizontal,
                                 padding: const EdgeInsets.only(left: 16),
                                 itemCount: movieData.latestMovies.length,
+                                cacheExtent: 1000,
+                                addAutomaticKeepAlives: true,
                                 itemBuilder: (context, rowIndex) {
                                   var latestmovies = movieData.latestMovies[rowIndex];
                                   return _buildNetflixCard(
@@ -686,31 +689,26 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[800],
-                            child: const Icon(
-                              Icons.movie,
-                              color: Colors.white54,
-                              size: 50,
+                      CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.fill,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[800],
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xffE50914),
+                              strokeWidth: 2,
                             ),
-                          );
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.grey[800],
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xffE50914),
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          );
-                        },
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[800],
+                          child: const Icon(
+                            Icons.movie,
+                            color: Colors.white54,
+                            size: 50,
+                          ),
+                        ),
                       ),
                       // Hover effect overlay
                       Container(

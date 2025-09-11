@@ -19,6 +19,16 @@ class HomeDataProvider extends ChangeNotifier {
   VideoStreamingApp? videoStreamingApp;
   List<ReferalModel> referalList = [];
 
+  // Slider index for carousel
+  int _sliderIndex = 0;
+  int get sliderIndex => _sliderIndex;
+  set sliderIndex(int value) {
+    if (_sliderIndex != value) {
+      _sliderIndex = value;
+      notifyListeners();
+    }
+  }
+
   Future<VideoStreamingApp?> fetchVideoStreamingData({
     required BuildContext context,
   }) async {
